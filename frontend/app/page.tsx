@@ -142,15 +142,17 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-yellow-900/20 border border-yellow-500 rounded-2xl p-6">
+              <div className="bg-slate-500/20 border border-slate-400 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-yellow-400">Netral</p>
+                    <p className="text-slate-300">Netral</p>
 
-                    <h2 className="text-4xl font-bold mt-2">{neutral}</h2>
+                    <h2 className="text-4xl font-bold mt-2 text-white">
+                      {neutral}
+                    </h2>
                   </div>
 
-                  <Meh size={40} className="text-yellow-400" />
+                  <Meh size={40} className="text-slate-300" />
                 </div>
               </div>
 

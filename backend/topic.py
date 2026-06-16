@@ -1,70 +1,57 @@
 from gensim import corpora
 from gensim.models import LdaModel
 
-CUSTOM_TOPIC_STOPWORDS = {
-    "nya",
-    "aja",
-    "banget",
-    "mau",
-    "baru",
-    "makin",
-    "hari",
-    "jam",
-    "baik",
-}
 def interpret_topic(words):
 
     topic_categories = {
-        "Kendala Login dan Akses": [
-            "login",
-            "otp",
-            "verifikasi",
-            "akses",
-            "maintenance",
-            "masuk",
-            "aktivasi",
-            "blokir",
-        ],
+    "Kendala Login dan Akses": [
+        "login",
+        "otp",
+        "verifikasi",
+        "akses",
+        "maintenance",
+        "masuk",
+        "aktivasi",
+        "blokir",
+    ],
 
-        "Permasalahan Sistem Aplikasi": [
-            "error",
-            "eror",
-            "bug",
-            "crash",
-            "ganggu",
-            "gagal",
-            "loading",
-            "lemot",
-            "update",
-        ],
+    "Permasalahan Sistem Aplikasi": [
+        "error",
+        "eror",
+        "bug",
+        "crash",
+        "ganggu",
+        "gagal",
+        "loading",
+        "lemot",
+        "update",
+        "force",
+        "close",
+    ],
 
-        "Layanan Transaksi Perbankan": [
-            "transfer",
-            "transaksi",
-            "saldo",
-            "rekening",
-            "atm",
-            "bayar",
-            "pembayaran",
-            "tarik",
-            "kirim",
-        ],
+    "Layanan Transaksi Perbankan": [
+        "transfer",
+        "transaksi",
+        "saldo",
+        "rekening",
+        "atm",
+        "bayar",
+        "pembayaran",
+        "tarik",
+        "kirim",
+        "qris",
+    ],
 
-        "Kemudahan dan Kepuasan Pengguna": [
-            "mudah",
-            "cepat",
-            "baik",
-            "bagus",
-            "mantap",
-            "praktis",
-            "aman",
-            "bantu",
-            "guna",
-            "terimakasih",
-            "top",
-            "keren",
-        ],
-    }
+    "Kemudahan dan Kepuasan Pengguna": [
+        "mudah",
+        "cepat",
+        "praktis",
+        "aman",
+        "bantu",
+        "keren",
+        "top",
+    ],
+}
 
     scores = {}
 
@@ -112,15 +99,14 @@ def generate_topics(texts):
 
     for idx, topic in lda_model.show_topics(
         num_topics=3,
-        num_words=10,
+        num_words=3,
         formatted=False
     ):
 
         words = [
         word
         for word, _ in topic
-    if word not in CUSTOM_TOPIC_STOPWORDS
-]
+    ]
 
         topics.append({
             "topic": idx + 1,
