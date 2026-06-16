@@ -6,9 +6,5 @@
     "backend": "cd backend && python -m uvicorn main:app --reload",
     "frontend": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\""
-  },
-  "dependencies": {
-    "chartjs-plugin-datalabels": "^2.2.0",
-    "lucide-react": "^1.17.0"
   }
 }
