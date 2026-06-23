@@ -27,8 +27,12 @@ def home():
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...)):
 
-    # Baca dataset
     df = pd.read_csv(file.file)
+    # Hapus baris kosong pada kolom review
+    df = df.dropna(subset=["review"])
+    # Hapus data duplikat
+    df = df.drop_duplicates(subset=["review"])
+    df = df.reset_index(drop=True)
 
     # Ambil kolom review
     texts = df["review"].astype(str).tolist()
