@@ -17,16 +17,22 @@ type Props = {
   summary: Record<string, number>;
 };
 
-export default function PieChart({ summary }: Props) {
-  const labels = ["Netral", "Negatif", "Positif"];
+export default function TopicPieChart({ summary }: Props) {
+  const labels = Object.keys(summary);
 
-  const values = [
-    Number(summary?.netral ?? 0),
-    Number(summary?.negatif ?? 0),
-    Number(summary?.positif ?? 0),
-  ];
+  const values = Object.values(summary).map(Number);
 
-  const total = values.reduce((sum, value) => sum + value, 0);
+  const total = values.reduce((a, b) => a + b, 0);
+
+  const colorMap: Record<string, string> = {
+    "Kendala Login dan Akses": "#8b5cf6",
+    "Permasalahan Sistem Aplikasi": "#ef4444",
+    "Layanan Transaksi Perbankan": "#22c55e",
+    "Kemudahan dan Kepuasan Pengguna": "#3b82f6",
+    "Topik Umum Pengguna": "#6b7280",
+  };
+
+  const backgroundColor = labels.map((label) => colorMap[label] ?? "#f59e0b");
 
   const data = {
     labels,
@@ -35,11 +41,8 @@ export default function PieChart({ summary }: Props) {
       {
         data: values,
 
-        backgroundColor: [
-          "#828282", 
-          "#ef4444", 
-          "#22c55e",
-        ],
+        backgroundColor,
+
         borderColor: "#1e293b",
 
         borderWidth: 2,
@@ -49,7 +52,7 @@ export default function PieChart({ summary }: Props) {
 
   const options: ChartOptions<"pie"> = {
     responsive: true,
-    rotation: 0,
+
     maintainAspectRatio: false,
 
     plugins: {
@@ -58,11 +61,8 @@ export default function PieChart({ summary }: Props) {
 
         labels: {
           color: "#ffffff",
-          padding: 20,
 
-          font: {
-            size: 14,
-          },
+          padding: 20,
         },
       },
 
@@ -73,7 +73,7 @@ export default function PieChart({ summary }: Props) {
 
             const percent = ((value / total) * 100).toFixed(1);
 
-            return `${context.label}: ${value.toLocaleString()} (${percent}%)`;
+            return `${context.label}: ${value} (${percent}%)`;
           },
         },
       },
@@ -95,7 +95,7 @@ export default function PieChart({ summary }: Props) {
               <span>{label}</span>
 
               <span>
-                {values[index].toLocaleString()} ({percent}%)
+                {values[index]} ({percent}%)
               </span>
             </div>
           );

@@ -6,8 +6,9 @@ classifier = pipeline(
 )
 
 LABEL_MAP = {
-    "LABEL_0": "negative",
-    "LABEL_2": "positive"
+    "LABEL_0": "negatif",
+    "LABEL_1": "netral",
+    "LABEL_2": "positif"
 }
 
 def analyze_sentiment(texts):
@@ -18,19 +19,14 @@ def analyze_sentiment(texts):
 
     for r in results:
 
-        score = float(r["score"])
-
-        if score < 0.75:
-            sentiment = "neutral"
-        else:
-            sentiment = LABEL_MAP.get(
-                r["label"],
-                "neutral"
-            )
+        sentiment = LABEL_MAP.get(
+            r["label"],
+            "tidak diketahui"
+        )
 
         output.append({
             "label": sentiment,
-            "score": score
+            "score": r["score"]
         })
 
     return output

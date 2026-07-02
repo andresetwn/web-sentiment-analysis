@@ -28,30 +28,42 @@ def home():
 async def analyze(file: UploadFile = File(...)):
 
     df = pd.read_csv(file.file)
-    # Hapus baris kosong pada kolom review
+
+    # ==========================
+    # DATA PREPARATION
+    # ==========================
+
+    total_before = len(df)
+    missing_count = df.isna().any(axis=1).sum()
+    duplicate_count = df.duplicated().sum()
+    # Hapus missing value
     df = df.dropna(subset=["review"])
-    # Hapus data duplikat
-    df = df.drop_duplicates(subset=["review"])
+    # Hapus review kosong
+    df = df[df["review"].str.strip() != ""]
+    # Hapus duplikat
+    df = df.drop_duplicates()
     df = df.reset_index(drop=True)
+    total_after = len(df)
 
-    # Ambil kolom review
+    # ==========================
+    # PREPROCESSING
+    # ==========================
     texts = df["review"].astype(str).tolist()
-
-    # Preprocessing untuk IndoBERT
     bert_texts = [
         clean_text_bert(text)
         for text in texts
     ]
-
-    # Preprocessing untuk LDA
     lda_texts = [
         clean_text_lda(text)
         for text in texts
     ]
+    df["clean_review_bert"] = bert_texts
+    df["clean_review_lda"] = lda_texts
 
-    # Analisis sentimen menggunakan IndoBERT
+    # ==========================
+    # SENTIMENT
+    # ==========================
     sentiments = analyze_sentiment(bert_texts)
-
     results = []
     labels = []
 
@@ -61,7 +73,6 @@ async def analyze(file: UploadFile = File(...)):
         sentiments,
     ):
         labels.append(sentiment["label"])
-
         results.append({
             "review": original_text,
             "cleaned_text": cleaned_text,
@@ -69,14 +80,28 @@ async def analyze(file: UploadFile = File(...)):
             "score": sentiment["score"],
         })
 
-    # Ringkasan jumlah sentimen
     summary = dict(Counter(labels))
 
-    # Topic Modeling menggunakan hasil preprocessing LDA
-    topics = generate_topics(lda_texts)
+    # ==========================
+    # TOPIC MODELING
+    # ==========================
+
+    topics, topic_summary = generate_topics(lda_texts)
+
+    # ==========================
+    # RETURN
+    # ==========================
 
     return {
+
+        "preprocessing": {
+            "total_before": total_before,
+            "missing": int(missing_count),
+            "duplicate": int(duplicate_count),
+            "total_after": total_after,
+        },
         "summary": summary,
+        "topic_summary": topic_summary,
         "topics": topics,
         "results": results,
     }

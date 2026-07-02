@@ -8,9 +8,12 @@ import {
   Meh,
   Frown,
   BarChart3,
-  Brain,
+  Database,
+  FileWarning,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
-
+import TopicPieChart from "@/components/TopicPieChart";
 import PieChart from "@/components/PieChart";
 import BarChart from "@/components/BarChart";
 import { uploadDataset } from "@/services/api";
@@ -22,8 +25,19 @@ type TopicType = {
 };
 
 type ResultType = {
+  preprocessing: {
+    total_before: number;
+    missing: number;
+    duplicate: number;
+    total_after: number;
+  };
+
   summary: Record<string, number>;
+
+  topic_summary: Record<string, number>;
+
   topics: TopicType[];
+
   results: {
     review: string;
     sentiment: string;
@@ -65,9 +79,9 @@ export default function Home() {
     setLoading(false);
   };
 
-  const positive = result?.summary?.positive || 0;
-  const neutral = result?.summary?.neutral || 0;
-  const negative = result?.summary?.negative || 0;
+  const positive = result?.summary?.positif || 0;
+  const neutral = result?.summary?.netral || 0;
+  const negative = result?.summary?.negatif || 0;
   const total = result?.results?.length || 0;
 
   return (
@@ -76,7 +90,7 @@ export default function Home() {
       <div className="border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold">OCTO Mobile Dashboard</h1>
+            <h1 className="text-4xl font-bold">OCTO Mobile Analytics</h1>
 
             <p className="text-slate-400 mt-2">
               Analisis Sentimen Menggunakan IndoBERT & LDA
@@ -115,8 +129,74 @@ export default function Home() {
         {/* DASHBOARD */}
         {result && (
           <>
-            {/* CARD SUMMARY */}
+            {/* DATA PREPARATION */}
 
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Ringkasan Pra-pemrosesan</h2>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-5 mb-8">
+              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-slate-400">Data Awal</p>
+
+                    <h2 className="text-4xl font-bold mt-2">
+                      {result.preprocessing.total_before}
+                    </h2>
+                  </div>
+
+                  <Database size={40} className="text-violet-400" />
+                </div>
+              </div>
+
+              <div className="bg-yellow-900/20 border border-yellow-500 rounded-2xl p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-yellow-400">Nilai Kosong</p>
+
+                    <h2 className="text-4xl font-bold mt-2">
+                      {result.preprocessing.missing}
+                    </h2>
+                  </div>
+
+                  <FileWarning size={40} className="text-yellow-400" />
+                </div>
+              </div>
+
+              <div className="bg-orange-900/20 border border-orange-500 rounded-2xl p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-orange-400">Data Duplikat</p>
+
+                    <h2 className="text-4xl font-bold mt-2">
+                      {result.preprocessing.duplicate}
+                    </h2>
+                  </div>
+
+                  <Trash2 size={40} className="text-orange-400" />
+                </div>
+              </div>
+
+              <div className="bg-green-900/20 border border-green-500 rounded-2xl p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-green-400">Data Bersih</p>
+
+                    <h2 className="text-4xl font-bold mt-2">
+                      {result.preprocessing.total_after}
+                    </h2>
+                  </div>
+
+                  <CheckCircle2 size={40} className="text-green-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* CARD SUMMARY */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Ringkasan Sentimen</h2>
+            </div>
             <div className="grid md:grid-cols-4 gap-5 mb-8">
               <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
                 <div className="flex justify-between items-center">
@@ -170,7 +250,9 @@ export default function Home() {
             </div>
 
             {/* CHART */}
-
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Visualisasi Sentimen</h2>
+            </div>
             <div className="grid lg:grid-cols-2 gap-6 mb-8">
               <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
                 <div className="flex items-center gap-2 mb-5">
@@ -195,13 +277,57 @@ export default function Home() {
               </div>
             </div>
 
-            {/* TOPIC MODELING */}
+            {/* TABEL */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-8">
+              <h2 className="text-2xl font-bold mb-6">
+                Hasil Analisis Sentimen
+              </h2>
 
+              <div className="overflow-auto max-h-150">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-slate-900">
+                    <tr>
+                      <th className="text-left p-4">Review</th>
+
+                      <th className="text-left p-4">Sentimen</th>
+
+                      <th className="text-left p-4">Score</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {result.results.map((item, index) => (
+                      <tr key={index} className="border-t border-slate-700">
+                        <td className="p-4">{item.review}</td>
+
+                        <td className="p-4">
+                          <span
+                            className={
+                              item.sentiment === "positif"
+                                ? "text-green-400 font-semibold"
+                                : item.sentiment === "negatif"
+                                  ? "text-red-400 font-semibold"
+                                  : "text-gray-400 font-semibold"
+                            }
+                          >
+                            {item.sentiment}
+                          </span>
+                        </td>
+
+                        <td className="p-4">{item.score.toFixed(4)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* TOPIC MODELING */}
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-8">
               <div className="flex items-center gap-2 mb-6">
-                <Brain size={22} className="text-violet-400" />
-
-                <h2 className="text-xl font-bold">Topic Modeling (LDA)</h2>
+                <h2 className="text-xl font-bold">
+                  Hasil Topic Modeling (LDA)
+                </h2>
               </div>
 
               <div className="space-y-4">
@@ -238,49 +364,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* TABEL */}
-
+            {/* DISTRIBUSI TOPIK */}
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-              <h2 className="text-2xl font-bold mb-6">
-                Hasil Analisis Sentimen
-              </h2>
+              <div className="flex items-center gap-2 mb-5">
+                <h2 className="text-xl font-bold">Distribusi Topik</h2>
+              </div>
 
-              <div className="overflow-auto max-h-150">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-slate-900">
-                    <tr>
-                      <th className="text-left p-4">Review</th>
-
-                      <th className="text-left p-4">Sentimen</th>
-
-                      <th className="text-left p-4">Score</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {result.results.map((item, index) => (
-                      <tr key={index} className="border-t border-slate-700">
-                        <td className="p-4">{item.review}</td>
-
-                        <td className="p-4">
-                          <span
-                            className={
-                              item.sentiment === "positive"
-                                ? "text-green-400 font-semibold"
-                                : item.sentiment === "negative"
-                                  ? "text-red-400 font-semibold"
-                                  : "text-yellow-400 font-semibold"
-                            }
-                          >
-                            {item.sentiment}
-                          </span>
-                        </td>
-
-                        <td className="p-4">{item.score.toFixed(4)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="max-w-lg mx-auto">
+                <TopicPieChart summary={result.topic_summary} />
               </div>
             </div>
           </>

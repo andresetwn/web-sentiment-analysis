@@ -28,12 +28,12 @@ type Props = {
 };
 
 export default function BarChart({ summary }: Props) {
-  const labels = ["Positive", "Negative", "Neutral"];
+  const labels = ["Positif", "Negatif", "Netral"];
 
   const values = [
-    Number(summary?.positive ?? 0),
-    Number(summary?.negative ?? 0),
-    Number(summary?.neutral ?? 0),
+    Number(summary?.positif ?? 0),
+    Number(summary?.negatif ?? 0),
+    Number(summary?.netral ?? 0),
   ];
 
   const total = values.reduce((sum, value) => sum + value, 0);
