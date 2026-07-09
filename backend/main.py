@@ -29,25 +29,17 @@ async def analyze(file: UploadFile = File(...)):
 
     df = pd.read_csv(file.file)
 
-    # ==========================
     # DATA PREPARATION
-    # ==========================
-
     total_before = len(df)
     missing_count = df.isna().any(axis=1).sum()
     duplicate_count = df.duplicated().sum()
-    # Hapus missing value
     df = df.dropna(subset=["review"])
-    # Hapus review kosong
     df = df[df["review"].str.strip() != ""]
-    # Hapus duplikat
     df = df.drop_duplicates()
     df = df.reset_index(drop=True)
     total_after = len(df)
-
-    # ==========================
+  
     # PREPROCESSING
-    # ==========================
     texts = df["review"].astype(str).tolist()
     bert_texts = [
         clean_text_bert(text)
@@ -60,9 +52,7 @@ async def analyze(file: UploadFile = File(...)):
     df["clean_review_bert"] = bert_texts
     df["clean_review_lda"] = lda_texts
 
-    # ==========================
-    # SENTIMENT
-    # ==========================
+    # SENTIMEN
     sentiments = analyze_sentiment(bert_texts)
     results = []
     labels = []
@@ -82,15 +72,8 @@ async def analyze(file: UploadFile = File(...)):
 
     summary = dict(Counter(labels))
 
-    # ==========================
     # TOPIC MODELING
-    # ==========================
-
     topics, topic_summary = generate_topics(lda_texts)
-
-    # ==========================
-    # RETURN
-    # ==========================
 
     return {
 

@@ -89,25 +89,15 @@ CUSTOM_STOPWORDS = {
     "keren",
     
 }
-# =========================
-# UNTUK INDOBERT
-# =========================
-
 def clean_text_bert(text):
 
     text = str(text).lower()
     text = re.sub(r'http\S+', '', text)
     text = re.sub(r'@\w+', '', text)
     text = re.sub(r'#\w+', '', text)
-    text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
-
-
-# =========================
-# UNTUK LDA
-# =========================
 
 def clean_text_lda(text):
 

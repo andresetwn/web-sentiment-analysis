@@ -48,6 +48,7 @@ type ResultType = {
 export default function Home() {
  const [result, setResult] = useState<ResultType | null>(null);
  const [loading, setLoading] = useState(false);
+ const [showUploadModal, setShowUploadModal] = useState(false);
 
  useEffect(() => {
    const saved = localStorage.getItem("analysis_result");
@@ -85,25 +86,112 @@ export default function Home() {
   const total = result?.results?.length || 0;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-linear-to-br bg-white text-black">
       {/* HEADER */}
-      <div className="border-b border-slate-800">
+      <div className="border-b border-slate-400">
+        {/* UPLOAD DATASET MODAL */}
+        {showUploadModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+            onClick={() => setShowUploadModal(false)}
+          >
+            <div
+              className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white">
+                  Upload Dataset
+                </h2>
+
+                <p className="mt-2 text-sm text-slate-400">
+                  Pilih dataset yang akan dianalisis menggunakan IndoBERT dan
+                  LDA.
+                </p>
+              </div>
+              <div className="mb-6 rounded-xl border border-violet-500/40 bg-violet-500/10 p-4">
+                <h3 className="font-semibold text-violet-300">
+                  Ketentuan Dataset
+                </h3>
+
+                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                  <p>
+                    • Format file harus berupa{" "}
+                    <span className="font-semibold text-white">CSV (.csv)</span>
+                  </p>
+
+                  <p>
+                    • Dataset wajib memiliki kolom{" "}
+                    <span className="rounded bg-slate-800 px-2 py-1 font-mono text-violet-300">
+                      review
+                    </span>
+                  </p>
+
+                  <p>
+                    • Kolom{" "}
+                    <span className="rounded bg-slate-800 px-2 py-1 font-mono text-violet-300">
+                      review
+                    </span>{" "}
+                    berisi teks ulasan pengguna.
+                  </p>
+
+                  <p>
+                    • Baris kosong dan data duplikat akan diproses pada tahap
+                    data preparation.
+                  </p>
+                </div>
+              </div>
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-600 bg-slate-800/50 p-8 transition hover:border-violet-500 hover:bg-violet-500/5">
+                <Upload size={36} className="mb-3 text-violet-400" />
+
+                <span className="font-semibold text-white">
+                  Pilih File Dataset
+                </span>
+
+                <span className="mt-1 text-sm text-slate-400">
+                  Hanya file CSV
+                </span>
+
+                <input
+                  type="file"
+                  accept=".csv,text/csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    setShowUploadModal(false);
+                    handleUpload(e);
+                  }}
+                />
+              </label>
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="rounded-xl bg-slate-700 px-5 py-2.5 text-white transition hover:bg-slate-600"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold">OCTO Mobile Analytics</h1>
 
-            <p className="text-slate-400 mt-2">
+            <p className="text-slate-600 mt-2">
               Analisis Sentimen Menggunakan IndoBERT & LDA
             </p>
           </div>
 
           <div className="flex gap-3">
-            <label className="cursor-pointer bg-violet-600 hover:bg-violet-700 transition px-5 py-3 rounded-xl flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowUploadModal(true)}
+              className="cursor-pointer bg-violet-600 hover:bg-violet-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
+            >
               <Upload size={18} />
               Upload Dataset
-              <input type="file" className="hidden" onChange={handleUpload} />
-            </label>
-
+            </button>
             <button
               onClick={() => {
                 localStorage.removeItem("analysis_result");
@@ -121,7 +209,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto p-8">
         {/* LOADING */}
         {loading && (
-          <div className="bg-slate-800 rounded-2xl p-8 text-center">
+          <div className="bg-white border border-slate-400 rounded-2xl p-8 text-center">
             <p className="text-xl font-semibold">Memproses Dataset...</p>
           </div>
         )}
@@ -136,10 +224,10 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-4 gap-5 mb-8">
-              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+              <div className="bg-white rounded-2xl p-6 border border-slate-400">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-400">Data Awal</p>
+                    <p className="text-slate-800">Data Awal</p>
 
                     <h2 className="text-4xl font-bold mt-2">
                       {result.preprocessing.total_before}
@@ -150,7 +238,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-yellow-900/20 border border-yellow-500 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-yellow-500 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-yellow-400">Nilai Kosong</p>
@@ -164,7 +252,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-orange-900/20 border border-orange-500 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-orange-500 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-orange-400">Data Duplikat</p>
@@ -178,7 +266,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-green-900/20 border border-green-500 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-green-500 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-green-400">Data Bersih</p>
@@ -198,10 +286,10 @@ export default function Home() {
               <h2 className="text-2xl font-bold">Ringkasan Sentimen</h2>
             </div>
             <div className="grid md:grid-cols-4 gap-5 mb-8">
-              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+              <div className="bg-white rounded-2xl p-6 border border-slate-400">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-400">Total Ulasan</p>
+                    <p className="text-slate-800">Total Ulasan</p>
 
                     <h2 className="text-4xl font-bold mt-2">{total}</h2>
                   </div>
@@ -210,7 +298,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-green-900/20 border border-green-500 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-green-500 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-green-400">Positif</p>
@@ -222,12 +310,12 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-slate-500/20 border border-slate-400 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-slate-400 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-300">Netral</p>
+                    <p className="text-slate-700">Netral</p>
 
-                    <h2 className="text-4xl font-bold mt-2 text-white">
+                    <h2 className="text-4xl font-bold mt-2 text-black">
                       {neutral}
                     </h2>
                   </div>
@@ -236,7 +324,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-red-900/20 border border-red-500 rounded-2xl p-6">
+              <div className="bg-gray-100/20 border border-red-500 rounded-2xl p-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-red-400">Negatif</p>
@@ -254,7 +342,7 @@ export default function Home() {
               <h2 className="text-2xl font-bold">Visualisasi Sentimen</h2>
             </div>
             <div className="grid lg:grid-cols-2 gap-6 mb-8">
-              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+              <div className="bg-white rounded-2xl p-6 border border-slate-400">
                 <div className="flex items-center gap-2 mb-5">
                   <BarChart3 size={22} />
 
@@ -266,7 +354,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+              <div className="bg-white rounded-2xl p-6 border border-slate-400">
                 <div className="flex items-center gap-2 mb-5">
                   <BarChart3 size={22} />
 
@@ -278,14 +366,14 @@ export default function Home() {
             </div>
 
             {/* TABEL */}
-            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-8">
+            <div className="bg-white rounded-2xl p-6 border border-slate-400 mb-8">
               <h2 className="text-2xl font-bold mb-6">
                 Hasil Analisis Sentimen
               </h2>
 
               <div className="overflow-auto max-h-150">
                 <table className="w-full">
-                  <thead className="sticky top-0 bg-slate-900">
+                  <thead className="sticky top-0 bg-white">
                     <tr>
                       <th className="text-left p-4">Review</th>
 
@@ -297,7 +385,7 @@ export default function Home() {
 
                   <tbody>
                     {result.results.map((item, index) => (
-                      <tr key={index} className="border-t border-slate-700">
+                      <tr key={index} className="border-t border-slate-400">
                         <td className="p-4">{item.review}</td>
 
                         <td className="p-4">
@@ -307,7 +395,7 @@ export default function Home() {
                                 ? "text-green-400 font-semibold"
                                 : item.sentiment === "negatif"
                                   ? "text-red-400 font-semibold"
-                                  : "text-gray-400 font-semibold"
+                                  : "text-gray-700 font-semibold"
                             }
                           >
                             {item.sentiment}
@@ -323,7 +411,7 @@ export default function Home() {
             </div>
 
             {/* TOPIC MODELING */}
-            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-8">
+            <div className="bg-white rounded-2xl p-6 border border-slate-400 mb-8">
               <div className="flex items-center gap-2 mb-6">
                 <h2 className="text-xl font-bold">
                   Hasil Topic Modeling (LDA)
@@ -332,13 +420,13 @@ export default function Home() {
 
               <div className="space-y-4">
                 {result.topics.map((topic, index) => (
-                  <div key={index} className="bg-slate-700 rounded-xl p-4">
+                  <div key={index} className="bg-slate-100 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-violet-400 text-lg">
+                      <h3 className="font-bold text-violet-600 text-lg">
                         Topik {topic.topic}
                       </h3>
 
-                      <span className="bg-violet-500/20 text-violet-300 px-3 py-1 rounded-full text-sm">
+                      <span className="bg-violet-600 text-gray-100 px-3 py-1 rounded-full text-sm">
                         {topic.title}
                       </span>
                     </div>
@@ -347,14 +435,14 @@ export default function Home() {
                       {topic.keywords.map((word: string, idx: number) => (
                         <span
                           key={idx}
-                          className="bg-violet-600 px-3 py-1 rounded-full text-sm"
+                          className="bg-violet-600 px-3 py-1 rounded-full text-sm text-gray-100"
                         >
                           {word}
                         </span>
                       ))}
                     </div>
-                    <p className="mt-4 text-slate-300 text-sm border-t border-slate-600 pt-3">
-                      <span className="font-semibold text-white">
+                    <p className="mt-4 text-slate-700 text-sm border-t border-slate-300 pt-3">
+                      <span className="font-semibold text-black">
                         Interpretasi:
                       </span>{" "}
                       {topic.title}
@@ -365,7 +453,7 @@ export default function Home() {
             </div>
 
             {/* DISTRIBUSI TOPIK */}
-            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+            <div className="bg-white rounded-2xl p-6 border border-slate-400">
               <div className="flex items-center gap-2 mb-5">
                 <h2 className="text-xl font-bold">Distribusi Topik</h2>
               </div>

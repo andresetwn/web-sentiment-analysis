@@ -28,12 +28,12 @@ type Props = {
 };
 
 export default function BarChart({ summary }: Props) {
-  const labels = ["Positif", "Negatif", "Netral"];
+  const labels = ["Netral", "Negatif", "Positif"];
 
   const values = [
-    Number(summary?.positif ?? 0),
-    Number(summary?.negatif ?? 0),
     Number(summary?.netral ?? 0),
+    Number(summary?.negatif ?? 0),
+    Number(summary?.positif ?? 0),
   ];
 
   const total = values.reduce((sum, value) => sum + value, 0);
@@ -47,7 +47,7 @@ export default function BarChart({ summary }: Props) {
 
         data: values,
 
-        backgroundColor: ["#22c55e", "#ef4444", "#828282"],
+        backgroundColor: ["#828282", "#ef4444", "#22c55e"],
 
         borderRadius: 12,
 
@@ -105,8 +105,22 @@ export default function BarChart({ summary }: Props) {
   };
 
   return (
-    <div className="h-100">
-      <Bar data={data} options={options} />
+    <div className="w-full">
+      <div className="h-87.5">
+        <Bar data={data} options={options} />
+      </div>
+      <div className="mt-4 space-y-2">
+        {labels.map((label, index) => (
+          <div
+            key={label}
+            className="flex justify-between items-center text-sm"
+          >
+            <span>{label}</span>
+
+            <span>{values[index].toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

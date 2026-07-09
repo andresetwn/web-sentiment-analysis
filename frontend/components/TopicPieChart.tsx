@@ -60,7 +60,7 @@ export default function TopicPieChart({ summary }: Props) {
         position: "bottom",
 
         labels: {
-          color: "#ffffff",
+          color: "#080808",
 
           padding: 20,
         },

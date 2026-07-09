@@ -91,8 +91,6 @@ def generate_topics(texts):
 
     topics = []
     topic_counter = Counter()
-
-    # mengambil keyword tiap topik
     lda_topics = lda_model.show_topics(
         num_topics=3,
         num_words=3,
@@ -112,10 +110,7 @@ def generate_topics(texts):
             "keywords": words
         })
 
-    # ==========================
     # PERHITUNGAN DISTRIBUSI TOPIK
-    # ==========================
-
     for bow in corpus:
         topic_probs = lda_model.get_document_topics(bow)
         dominant_topic = max(
