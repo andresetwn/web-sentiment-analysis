@@ -92,63 +92,67 @@ export default function Home() {
         {/* UPLOAD DATASET MODAL */}
         {showUploadModal && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm"
             onClick={() => setShowUploadModal(false)}
           >
             <div
-              className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+              className="w-full max-w-lg rounded-2xl border border-slate-300 bg-white p-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* HEADER */}
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-slate-900">
                   Upload Dataset
                 </h2>
 
-                <p className="mt-2 text-sm text-slate-400">
+                <p className="mt-2 text-sm text-slate-500">
                   Pilih dataset yang akan dianalisis menggunakan IndoBERT dan
                   LDA.
                 </p>
               </div>
-              <div className="mb-6 rounded-xl border border-violet-500/40 bg-violet-500/10 p-4">
-                <h3 className="font-semibold text-violet-300">
+
+              {/* KETENTUAN DATASET */}
+              <div className="mb-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
+                <h3 className="font-semibold text-violet-700">
                   Ketentuan Dataset
                 </h3>
 
-                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                <div className="mt-3 space-y-3 text-sm text-slate-600">
                   <p>
                     • Format file harus berupa{" "}
-                    <span className="font-semibold text-white">CSV (.csv)</span>
+                    <span className="font-semibold text-slate-900">
+                      CSV (.csv)
+                    </span>
                   </p>
 
                   <p>
                     • Dataset wajib memiliki kolom{" "}
-                    <span className="rounded bg-slate-800 px-2 py-1 font-mono text-violet-300">
+                    <span className="rounded-md bg-violet-100 px-2 py-1 font-mono text-violet-700">
                       review
                     </span>
                   </p>
 
                   <p>
                     • Kolom{" "}
-                    <span className="rounded bg-slate-800 px-2 py-1 font-mono text-violet-300">
+                    <span className="rounded-md bg-violet-100 px-2 py-1 font-mono text-violet-700">
                       review
                     </span>{" "}
                     berisi teks ulasan pengguna.
                   </p>
-
-                  <p>
-                    • Baris kosong dan data duplikat akan diproses pada tahap
-                    data preparation.
-                  </p>
                 </div>
               </div>
-              <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-600 bg-slate-800/50 p-8 transition hover:border-violet-500 hover:bg-violet-500/5">
-                <Upload size={36} className="mb-3 text-violet-400" />
 
-                <span className="font-semibold text-white">
+              {/* AREA UPLOAD */}
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 transition hover:border-violet-500 hover:bg-violet-50">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-100">
+                  <Upload size={28} className="text-violet-600" />
+                </div>
+
+                <span className="font-semibold text-slate-900">
                   Pilih File Dataset
                 </span>
 
-                <span className="mt-1 text-sm text-slate-400">
+                <span className="mt-1 text-sm text-slate-500">
                   Hanya file CSV
                 </span>
 
@@ -162,11 +166,13 @@ export default function Home() {
                   }}
                 />
               </label>
+
+              {/* BUTTON */}
               <div className="mt-6 flex justify-end">
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="rounded-xl bg-slate-700 px-5 py-2.5 text-white transition hover:bg-slate-600"
+                  className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                   Batal
                 </button>
