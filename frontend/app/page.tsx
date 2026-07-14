@@ -16,7 +16,7 @@ import {
 import TopicPieChart from "@/components/TopicPieChart";
 import PieChart from "@/components/PieChart";
 import BarChart from "@/components/BarChart";
-import { uploadDataset } from "@/services/api";
+import { uploadDataset, scrapeDataset } from "@/services/api";
 
 type TopicType = {
   topic: number;
@@ -49,6 +49,12 @@ export default function Home() {
  const [result, setResult] = useState<ResultType | null>(null);
  const [loading, setLoading] = useState(false);
  const [showUploadModal, setShowUploadModal] = useState(false);
+ const [showScrapeModal, setShowScrapeModal] = useState(false);
+ const [reviewCount, setReviewCount] = useState(3000);
+ const [newest, setNewest] = useState(true);
+ const [startDate, setStartDate] = useState("");
+ const [endDate, setEndDate] = useState("");
+ const [scraping, setScraping] = useState(false);
 
  useEffect(() => {
    const saved = localStorage.getItem("analysis_result");
@@ -78,6 +84,45 @@ export default function Home() {
     }
 
     setLoading(false);
+  };
+  const handleScrape = async () => {
+    try {
+      setScraping(true);
+
+      const response = await scrapeDataset(
+        reviewCount,
+        newest,
+        startDate || undefined,
+        endDate || undefined,
+      );
+      if (!response.ok) {
+        throw new Error("Gagal mengambil dataset");
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get("Content-Disposition");
+      let filename = "dataset_octo_mobile.csv";
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      setShowScrapeModal(false);
+      alert("Dataset berhasil diunduh.");
+    } catch (error) {
+      console.error(error);
+      alert("Gagal mengambil dataset.");
+    } finally {
+      setScraping(false);
+    }
   };
 
   const positive = result?.summary?.positif || 0;
@@ -191,17 +236,24 @@ export default function Home() {
 
           <div className="flex gap-3">
             <button
-              type="button"
+              onClick={() => setShowScrapeModal(true)}
+              className="cursor-pointer bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
+            >
+              <Upload size={18} />
+              Ambil Dataset
+            </button>
+
+            <button
               onClick={() => setShowUploadModal(true)}
               className="cursor-pointer bg-violet-600 hover:bg-violet-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
             >
               <Upload size={18} />
               Upload Dataset
             </button>
+
             <button
               onClick={() => {
                 localStorage.removeItem("analysis_result");
-
                 setResult(null);
               }}
               className="bg-red-600 hover:bg-red-700 transition px-5 py-3 rounded-xl"
@@ -211,6 +263,131 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {showScrapeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowScrapeModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-7"
+          >
+            <h2 className="text-2xl font-bold text-slate-800">
+              Ambil Dataset OCTO Mobile
+            </h2>
+
+            <p className="text-slate-500 mt-2 mb-6">
+              Dataset akan diambil langsung dari Google Play Store.
+            </p>
+            <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 mb-6">
+              <p className="font-semibold text-blue-700">Sumber Dataset</p>
+
+              <p className="text-sm text-slate-600 mt-2">Google Play Store</p>
+
+              <p className="text-sm text-slate-600">
+                Aplikasi :<span className="font-semibold"> OCTO Mobile</span>
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <label className="font-semibold block mb-3">
+                Metode Pengambilan
+              </label>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={newest}
+                    onChange={() => setNewest(true)}
+                  />
+                  Review Terbaru
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={!newest}
+                    onChange={() => setNewest(false)}
+                  />
+                  Rentang Tanggal
+                </label>
+              </div>
+            </div>
+
+            {!newest && (
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Tanggal Awal
+                  </label>
+
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full border rounded-xl p-3"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Tanggal Akhir
+                  </label>
+
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full border rounded-xl p-3"
+                  />
+                </div>
+              </div>
+            )}
+            {/* Jumlah Review */}
+            <div className="mb-6">
+              <label className="block mb-2 font-semibold">
+                Maksimal Review
+              </label>
+
+              <select
+                value={reviewCount}
+                onChange={(e) => setReviewCount(Number(e.target.value))}
+                className="w-full border rounded-xl p-3"
+              >
+                <option value={1000}>1000 Review</option>
+
+                <option value={2000}>2000 Review</option>
+
+                <option value={3000}>3000 Review</option>
+              </select>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl p-4 mb-6 border">
+              <p className="text-sm text-slate-600">
+                Dataset akan otomatis diunduh dalam format CSV.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowScrapeModal(false)}
+                className="px-5 py-3 rounded-xl border"
+              >
+                Batal
+              </button>
+
+              <button
+                disabled={scraping}
+                onClick={handleScrape}
+                className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {scraping ? "Mengambil..." : "Ambil Dataset"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto p-8">
         {/* LOADING */}
