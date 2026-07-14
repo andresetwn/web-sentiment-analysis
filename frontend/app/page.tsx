@@ -237,7 +237,7 @@ export default function Home() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowScrapeModal(true)}
-              className="cursor-pointer bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
+              className="cursor-pointer text-white bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
             >
               <Upload size={18} />
               Ambil Dataset
@@ -245,7 +245,7 @@ export default function Home() {
 
             <button
               onClick={() => setShowUploadModal(true)}
-              className="cursor-pointer bg-violet-600 hover:bg-violet-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
+              className="cursor-pointer text-white bg-violet-600 hover:bg-violet-700 transition px-5 py-3 rounded-xl flex items-center gap-2"
             >
               <Upload size={18} />
               Upload Dataset
@@ -256,7 +256,7 @@ export default function Home() {
                 localStorage.removeItem("analysis_result");
                 setResult(null);
               }}
-              className="bg-red-600 hover:bg-red-700 transition px-5 py-3 rounded-xl"
+              className="text-white bg-red-600 hover:bg-red-700 transition px-5 py-3 rounded-xl"
             >
               Reset
             </button>
@@ -280,7 +280,7 @@ export default function Home() {
               Dataset akan diambil langsung dari Google Play Store.
             </p>
             <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 mb-6">
-              <p className="font-semibold text-blue-700">Sumber Dataset</p>
+              <p className="font-semibold text-gray-700">Sumber Dataset</p>
 
               <p className="text-sm text-slate-600 mt-2">Google Play Store</p>
 

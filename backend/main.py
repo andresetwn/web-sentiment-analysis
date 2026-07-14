@@ -45,13 +45,13 @@ async def scrape_dataset(request: ScrapeRequest):
     today = datetime.now().strftime("%Y%m%d")
     if request.newest:
         filename = (
-            f"dataset_octo_mobile_terbaru_{today}.csv"
+            f"DATASET OCTO MOBILE TERBARU_{today}.csv"
         )
     else:
         start = request.start_date.replace("-", "")
         end = request.end_date.replace("-", "")
         filename = (
-            f"dataset_octo_mobile_{start}_{end}.csv"
+            f"DATASET OCTO MOBILE {start}_{end}.csv"
         )
     df.to_csv(
         buffer,
